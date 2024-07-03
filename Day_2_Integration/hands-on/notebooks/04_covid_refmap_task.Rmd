@@ -1,0 +1,391 @@
+---
+title: "COVID reference-mapping task"
+author: "António Sousa (e-mail: <aggode@utu.fi>) - Elo lab (<https://elolab.utu.fi>)"
+date: "`r format(Sys.Date(), '%d/%m/%Y')`"
+output: 
+   html_document:
+      toc: true 
+      toc_float: true
+      theme: united
+      code_folding: hide
+---
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+# Reference-mapping task
+
+<br>
+
+This single-cell RNA-seq reference-mapping task describes an example of reference-mapping a human COVID-19 peripheral blood mononuclear cells (PBMC) against a previously annotate human PBMC data set. The COVID data set was downloaded as `Seurat` object from [cziscience](https://cellxgene.cziscience.com) (see the R script `01_create_datasets.R`) and the reference previously annotated PBMC data set retrieved from `SeuratData` (v.`r packageVersion("SeuratData")`): 
+
+   + reference (`ref`): 5,000 genes x 36,433 cells
+   
+   + query (`query`): 17,374 genes x 14,783 cells
+      
+<br>
+
+The analyses performed in this notebook rely in the `Seurat` (v.`r packageVersion("Seurat")`) and `Azimuth` (v.`r packageVersion("Azimuth")`). 
+
+```{r setup, include=FALSE}
+## Set up configuration for R chunks
+knitr::opts_chunk$set(
+	echo = TRUE,
+	fig.align = "center",
+	message = FALSE,
+	warning = FALSE
+)
+if ( ! "klippy" %in% row.names(installed.packages()) ) remotes::install_github("rlesur/klippy")
+```
+
+```{r klippy, echo=FALSE}
+## Configure the layout of icon to copy to clipboard the R chunk codes
+klippy::klippy(position = c('top', 'right'))
+```
+
+Import the main packages used in this notebook: `Seurat` (v.`r packageVersion("Seurat")`), `SeuratWrappers` (v.`r packageVersion("SeuratWrappers")` - integration wrappers for Seurat), `dplyr` (v.`r packageVersion("dplyr")` - wrangling data), `patchwork` (v.`r packageVersion("patchwork")` - visualization), `ComplexHeatmap` (v.`r packageVersion("ComplexHeatmap")` - heatmap), `Azimuth` (v.`r packageVersion("Azimuth")` - reference-mapping).
+
+```{r packages, message=FALSE, warning=FALSE}
+## Import packages
+library("dplyr") # data wrangling
+library("Seurat") # scRNA-seq analysis
+library("Azimuth") # reference-mapping
+library("patchwork") # viz
+library("ComplexHeatmap") # heatmap
+```
+
+Create output directories to save intermediate results, figures, tables and R objects. 
+
+```{r dirs}
+## Output directories
+res.dir <- file.path("../results", "covid_refmap_task", c("plots", "tables", "objects"))
+for (folder in res.dir) if (!dir.exists(folder)) dir.create(path = folder, recursive = TRUE)
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (1) Import datasets 
+
+_(5 min)_
+
+>AIM: Import and explore the Seurat object data. 
+
+<br>
+
+Import the human PBMCs from COVID-19 patients (`query`) as well as the healthy human PBMCs (`ref`) as `Seurat` objects located at `data/covid.rds` and `data/pbmcref`.  
+
+```{r import data}
+## Import query and reference Seurat objects
+data.dir <- "../data"
+
+# Reference
+ref <- readRDS(file = file.path(data.dir, "pbmcref.rds"))
+
+# Query
+query <- readRDS(file = file.path(data.dir, "covid.rds"))
+```
+
+Explore quickly the `Seurat` `query` and `ref` objects.
+
+```{r explore Seurat objects}
+## Explore Seurat objects
+# Print Seurat object
+query
+ref
+
+# Structure
+#str(query)
+#str(ref)
+
+# Check meta.data
+head(query@meta.data)
+head(ref@meta.data)
+
+# Check how different cell types are in the reference 
+table(ref$celltype.l1)
+table(ref$celltype.l2)
+
+# Check no. of genes 
+nrow(query)
+nrow(ref)
+
+# Check no. of cells 
+ncol(query)
+ncol(ref)
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (2) DimRed viz 
+
+_(10 min)_
+
+>AIM: Visualize data in the low dimensional space highlighting the different categorical variables of interest. 
+
+<br>
+
+Check the metadata of query and reference objects and choose the most interesting categorical variables to highlight into UMAP. 
+
+```{r dimred}
+## Dimensional reduction - visualization
+
+## Reference 
+colnames(ref@meta.data)
+ref.vars <- c("celltype.l1", "celltype.l2")
+ref.umap.plts <- lapply(X = ref.vars, function(x) {
+  DimPlot(object = ref, reduction = "refUMAP", group.by = x, pt.size = 0.1, label = TRUE)
+})
+
+## Query
+colnames(query@meta.data)[4] <- "disease_stage"
+colnames(query@meta.data)
+query.vars <- c("disease_stage", "donor_id", "timepoint", "Cell.group", "Cell.class_reannotated")
+query.umap.plts <- lapply(X = query.vars, function(x) {
+  DimPlot(object = query, reduction = "umap", group.by = x, pt.size = 0.1, label = TRUE)
+})
+```
+
+Plot the categorical variables `celltype.l1` and `celltype.l2` for the reference below. 
+
+```{r dimred - plot ref, fig.width = 9, fig.height = 4.5}
+## Plot dimensional reductions for reference
+(ref.umap.plts[[1]] + NoLegend()) + (ref.umap.plts[[2]] + NoLegend()) 
+```
+
+<br>
+
+Plot the categorical variables `disease_stage`, `donor_id`, `timepoint`, `Cell.group`, `Cell.class_reannotated` for the query below. 
+
+```{r dimred - plot query, fig.width = 15, fig.height = 4.5}
+## Plot dimensional reductions for reference
+(query.umap.plts[[1]]) + (query.umap.plts[[2]]) + (query.umap.plts[[3]]) 
+```
+
+```{r dimred - plot query 2, fig.width = 10, fig.height = 5}
+## Plot dimensional reductions for reference
+(query.umap.plts[[4]] + NoLegend()) + (query.umap.plts[[5]] + NoLegend()) 
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (3) Reference-mapping
+
+_(10 min)_
+
+>AIM: Annotate and project the query against the reference data set. 
+
+<br>
+
+Perform reference-mapping below by identifying anchors between the COVID versus healthy PBMCs data sets and transferring the labels of interest (`celltype.l1`, `celltype.l2`) from the previously annotated healthy data set into the query COVID data set with the functions `FindTransferAnchors()` and `MapQuery()`. Alternatively you can run the same procedure using the `Azimuth` function `RunAzimuth`. 
+
+```{r refmap}
+## Reference-mapping
+
+# Set to TRUE in case you wanna run with 'Azimuth'
+run.azimuth <- FALSE
+
+if (run.azimuth) {
+  query <- Azimuth::RunAzimuth(query, reference = "pbmcref")
+} else {
+  # Find anchors
+  anchors <- FindTransferAnchors(
+    reference = ref,
+    query = query, 
+    features = rownames(Loadings(ref[["refDR"]])),
+    reference.reduction = "refDR",
+    normalization.method = "SCT",
+    dims = 1:50
+  )
+  # Transfer labels
+  query <- MapQuery(
+    anchorset = anchors,
+    query = query,
+    reference = ref,
+    refdata = list(
+      celltype.l1 = "celltype.l1",
+      celltype.l2 = "celltype.l2"
+    ),
+    reduction.model = "refUMAP"
+  )
+  ## EXCEPTION (to project query onto reference UMAP): due to the Azimuth reference 'pbmcref'
+  query <- Azimuth:::NNTransform(object = query, meta.data = ref[[]]) # from 'RunAzimuth()'
+  query[["ref.umap"]] <- RunUMAP(object = query[["query_ref.nn"]], reduction.model = ref[["refUMAP"]], 
+                                  reduction.key = "UMAP_", verbose = TRUE)
+}
+
+# Save query R object
+saveRDS(object = query, file = file.path(res.dir[3], "query_refmap.rds"))
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (4) Assess reference-mapping
+
+_(15 min)_
+
+>AIM: Assess the accuracy of the reference-mapping task. 
+
+<br>
+
+Run the R chunk code below to compare the predicted cell type labels for the COVID data set against the healthy human PBMCs with the ground-truth cell labels. 
+
+```{r assess refmap accuracy}
+## Assessment of reference-mapping accuracy
+
+# Plot UMAPs
+refmap.plts <- list()
+refmap.plts[[1]] <- DimPlot(ref, reduction = "refUMAP", group.by =  "celltype.l1", 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1) + NoLegend()
+refmap.plts[[2]] <- DimPlot(ref, reduction = "refUMAP", group.by =  "celltype.l2", 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1) + NoLegend()
+refmap.plts[[3]] <- DimPlot(query, reduction = "ref.umap", group.by =  "Cell.group", 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1) + NoLegend()
+refmap.plts[[4]] <- DimPlot(query, reduction = "ref.umap", group.by =  "Cell.class_reannotated", 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1) +
+  NoLegend()
+refmap.plts[[5]] <- DimPlot(query, reduction = "ref.umap", group.by = "predicted.celltype.l1", 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1) +
+  NoLegend()
+refmap.plts[[6]] <- DimPlot(query, reduction = "ref.umap", group.by = "predicted.celltype.l2", 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1) +
+  NoLegend()
+refmap.plts[[7]] <- DimPlot(query, reduction = "ref.umap", group.by =  query.vars[1], 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1)
+refmap.plts[[8]] <- DimPlot(query, reduction = "ref.umap", group.by = query.vars[2], 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1)
+refmap.plts[[9]] <- DimPlot(query, reduction = "ref.umap", group.by = query.vars[3], 
+                            label = TRUE, pt.size = 0.1, alpha = 0.1)
+
+# Confusion matrices
+celltype1xgroup <- table(query$predicted.celltype.l1, query$Cell.group)
+celltype1xgroup <- celltype1xgroup %>% as.matrix.data.frame(.) %>% 
+  `colnames<-`(colnames(celltype1xgroup)) %>% `row.names<-`(row.names(celltype1xgroup))
+celltype1xclass <- table(query$predicted.celltype.l1, query$Cell.class_reannotated)
+celltype1xclass <- celltype1xclass %>% as.matrix.data.frame(.) %>% 
+  `colnames<-`(colnames(celltype1xclass)) %>% `row.names<-`(row.names(celltype1xclass))
+celltype2xgroup <- table(query$predicted.celltype.l2, query$Cell.group)
+celltype2xgroup <- celltype2xgroup %>% as.matrix.data.frame(.) %>% 
+  `colnames<-`(colnames(celltype2xgroup)) %>% `row.names<-`(row.names(celltype2xgroup))
+celltype2xclass <- table(query$predicted.celltype.l2, query$Cell.class_reannotated)
+celltype2xclass <- celltype2xclass %>% as.matrix.data.frame(.) %>% 
+  `colnames<-`(colnames(celltype2xclass)) %>% `row.names<-`(row.names(celltype2xclass))
+```
+
+Plot below the heatmaps of the confusion matrices between predicted cell type labels (`celltype.l1`, `celltype.l2`) versus ground-truth cell type labels (`Cell.group`, `class_reannotated`).
+
+```{r assess refmap accuracy - confusion matrices, fig.width=14, fig.height=7}
+tbls <- list("celltype1xCell.group" = celltype1xgroup, "celltype1xclass_reannotated" = celltype1xclass, 
+             "celltype2xCell.group" = celltype2xgroup, "celltype2xclass_reannotated" = celltype2xclass)
+heat.list <- lapply(X = setNames(names(tbls), names(tbls)), FUN = function(comp) {
+  Heatmap(matrix = t(apply(tbls[[comp]], 1, function(x) x/sum(x)*100)), name = "% of cells", 
+          cluster_rows = F, cluster_columns = F, row_names_side = "left",
+          show_column_names = T, show_row_names = TRUE,
+          col = circlize::colorRamp2(c(0, 50, 100), c("white", "red1", "red4")), 
+          column_names_side = "top", column_names_rot = 45, 
+          layer_fun = function(j, i, x, y, width, height, fill, slice_r, slice_c) {
+            v = pindex(tbls[[comp]], i, j)
+            grid.text(sprintf("%.0f", v), x, y, gp = gpar(fontsize = 10))
+            if(slice_r != slice_c) {
+              grid.rect(gp = gpar(lwd = 2, fill = "transparent"))
+            }
+          }, 
+          column_title = gsub("x", " vs ", comp), 
+          rect_gp = gpar(col = "white", lwd = 2)
+  )
+})
+
+# Print below
+heat.list$celltype1xCell.group + heat.list$celltype1xclass_reannotated
+heat.list$celltype2xCell.group + heat.list$celltype2xclass_reannotated
+```
+
+<br>
+
+Project the data below onto the reference UMAP highlighting the predicted (`celltype.l1`, `celltype.l2`) and ground-truth cell type labels (`Cell.group`, `class_reannotated`).
+
+```{r assess refmap accuracy - umaps ref, fig.width=9, fig.height=4.5}
+refmap.plts[[1]] + refmap.plts[[2]]
+```
+
+```{r assess refmap accuracy - umaps query ground-truth, fig.width=9, fig.height=4.5}
+refmap.plts[[3]] + refmap.plts[[4]]
+```
+
+```{r assess refmap accuracy - umaps query predicted, fig.width=9, fig.height=4.5}
+refmap.plts[[5]] + refmap.plts[[6]]
+```
+
+Plot the categorical variables `disease_stage`, `donor_id`, `timepoint` for the integrated query below. 
+
+```{r assess refmap accuracy - umaps query predicted vars, fig.width = 15, fig.height = 4.5}
+## Plot dimensional reductions for reference
+refmap.plts[[7]] + refmap.plts[[8]] + refmap.plts[[9]] 
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+#### R packages used and respective versions
+
+<br>
+
+```{r References, message=FALSE, warning=FALSE, paged.print=FALSE}
+## R packages and versions used in these analyses
+sessionInfo()
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>

@@ -1,0 +1,51 @@
+The following software is required in order to reproduce the analyses performed during the second day of the course related with integration (check first if you have these packages installed before try to installing them):
+
+    R programming language (>=v.4.1.0): https://www.r-project.org/
+
+
+    RStudio (v.1.4.1717© 2009-2021 RStudio, PBC - any version): https://posit.co/download/rstudio-desktop/
+
+
+    Seurat (v.5.1.0): https://satijalab.org/seurat/articles/install_v5
+        command: install.packages("Seurat")
+
+
+    remotes (v.2.5.0 - any version): https://cran.r-project.org/web/packages/remotes/index.html
+        command: install.packages("remotes")
+
+
+    SeuratWrappers (v.0.3.2): https://github.com/satijalab/seurat-wrappers
+        command: remotes::install_github("satijalab/seurat-wrappers", quiet = TRUE)
+
+
+    Azimuth (v.0.5.0): https://github.com/satijalab/azimuth
+        command: remotes::install_github("satijalab/azimuth", quiet = TRUE)
+
+
+    patchwork (>=v.1.2.0): https://patchwork.data-imaginist.com
+        command: install.packages("patchwork")
+
+
+    dplyr (>=v.1.1.4): https://dplyr.tidyverse.org
+        command: install.packages("dplyr")
+
+
+    scIntegrationMetrics (v.1.1): https://github.com/carmonalab/scIntegrationMetrics
+        command: remotes::install_github("carmonalab/scIntegrationMetrics")
+
+
+    ComplexHeatmap (v.2.15.4 - any version): https://jokergoo.github.io/ComplexHeatmap-reference/book
+        command: remotes::install_github("jokergoo/ComplexHeatmap")
+
+
+    BiocManager (v.1.30.23): https://www.bioconductor.org/install
+        command: install.packages("BiocManager")
+
+
+    zellkonverter (v.1.4.0): https://github.com/theislab/zellkonverter
+        command: BiocManager::install("zellkonverter")
+
+
+    matrixStats (v.1.1.0): https://cran.rstudio.com/web/packages/matrixStats
+        command: remotes::install_version("matrixStats", version = "1.1.0")
+

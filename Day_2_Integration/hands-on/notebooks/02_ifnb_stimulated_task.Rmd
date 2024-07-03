@@ -1,0 +1,562 @@
+---
+title: "Ifnb stimulated integration task"
+author: "António Sousa (e-mail: <aggode@utu.fi>) - Elo lab (<https://elolab.utu.fi>)"
+date: "`r format(Sys.Date(), '%d/%m/%Y')`"
+output: 
+   html_document:
+      toc: true 
+      toc_float: true
+      theme: united
+      code_folding: hide
+---
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+# Integration task
+
+<br>
+
+This single-cell RNA-seq integration task describes an example of an integration analysis involving different biological conditions: resting (named `CTRL`) versus interferon stimulated (named `STIM`) human peripheral blood mononuclear cells (PBMCs). The data set with cells coming from both biological conditions was retrieved from the `SeuratData` (v.`r packageVersion("SeuratData")`): 
+
+   + **ifnb** (resting and ifnb stimulated data sets): 
+   
+      + `ifnb` `SeuratData` data set (v.3.1.0): IFNB-Stimulated and Control PBMCs
+      
+      + no. of cells: 13,999 cells (6,548 in `CTRL` and 7,451 in `STIM`)
+      
+<br>
+
+The identity of the data set - `CTRL` or `STIM` - for every cell was saved in the `Seurat` `meta.data` column variable `stim`. The ground-truth cell identities were also provided in the column variable `seurat_annotations` but avoid checking them until the end of this notebook to make these analyses more interesting. 
+
+The analyses performed in this notebook rely in the `Seurat` R package (v.`r packageVersion("Seurat")`). 
+
+```{r setup, include=FALSE}
+## Set up configuration for R chunks
+knitr::opts_chunk$set(
+	echo = TRUE,
+	fig.align = "center",
+	message = FALSE,
+	warning = FALSE
+)
+if ( ! "klippy" %in% row.names(installed.packages()) ) remotes::install_github("rlesur/klippy")
+```
+
+```{r klippy, echo=FALSE}
+## Configure the layout of icon to copy to clipboard the R chunk codes
+klippy::klippy(position = c('top', 'right'))
+```
+
+Import the main packages used in this notebook: `Seurat` (v.`r packageVersion("Seurat")`), `SeuratWrappers` (v.`r packageVersion("SeuratWrappers")` - integration wrappers for Seurat), `dplyr` (v.`r packageVersion("dplyr")` - wrangling data), `patchwork` (v.`r packageVersion("patchwork")` - visualization), `scIntegrationMetrics` (v `r packageVersion("scIntegrationMetrics")` - compute LISI integration metrics).
+
+```{r packages, message=FALSE, warning=FALSE}
+## Import packages
+library("dplyr") # data wrangling
+library("Seurat") # scRNA-seq analysis
+library("patchwork") # viz
+library("SeuratWrappers") # integration wrappers
+library("scIntegrationMetrics") # compute LISI integration metrics
+```
+
+Create output directories to save intermediate results, figures, tables and R objects. 
+
+```{r dirs}
+## Output directories
+res.dir <- file.path("../results", "ifnb_stimulated_task", c("plots", "tables", "objects"))
+for (folder in res.dir) if (!dir.exists(folder)) dir.create(path = folder, recursive = TRUE)
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (1) Import datasets 
+
+_(5 min)_
+
+>AIM: Import and explore the Seurat object data. 
+
+<br>
+
+Import the ifnb stimulated `Seurat` R object `ifnb.rds` located in the folder `data`.  
+
+```{r import data}
+# Import data
+data.dir <- "../data"
+seu <- readRDS(file = file.path(data.dir, "ifnb.rds"))
+```
+
+<br>
+
+### Downsample dataset 
+
+<br>
+
+You may want to down sample this data set depending on the amount of RAM memory you have. The `ifnb` data set has 13,999 cells. 
+
+```{r downsample data set}
+## Downsample data set
+downsample <- TRUE # replace to FALSE in case you don't want to down sample
+prop.down <- 0.2 # proportion of cells to down sample per batch: 20% of the cells
+if (downsample) {
+  no.cells.batch <- ceiling(table(seu$stim) * 0.2) # CTRL = 1310 and STIM = 1491 
+  cell.idx.batch <- split(x = colnames(seu), f = seu$stim) # split into a list the cell names per batch
+  cell.idx.batch.down <- lapply(X = setNames(names(cell.idx.batch), names(cell.idx.batch)), FUN = function(x) {
+    set.seed(123)
+    sample(x = cell.idx.batch[[x]], size = no.cells.batch[[x]], replace = FALSE)
+  }) # downsample each batch cell names 
+  cell.idx.downsample <- do.call(c, cell.idx.batch.down) # join cell name labels from the two batches into one character vector
+  seu <- subset(seu, cells = cell.idx.downsample)
+}
+gc()
+cat("No. of cells downsampled for `CTRL` was:", table(seu$stim)[1], "\n")
+cat("No. of cells downsampled for `STIM` was:", table(seu$stim)[2], "\n")
+```
+
+Explore quickly the `Seurat` `seu` object.
+
+```{r explore Seurat object}
+## Explore Seurat object
+# Print Seurat object
+seu
+
+# Structure
+str(seu)
+
+# Check meta.data
+head(seu@meta.data)
+
+# Check how many cells per data set 
+table(seu$stim)
+
+# Check no. of genes 
+nrow(seu)
+
+# Check no. of cells 
+ncol(seu)
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (2) Assess batch effect
+
+<br>
+
+### Joint dimred
+
+_(7 min)_
+
+>AIM: See how much the two data sets overlap each other in the low dimensional reductions. 
+
+<br>
+
+Run the standard `Seurat` upstream workflow to jointly compute a PCA and UMAP for the datasets: 
+
+   1. `NormalizeData()`: log1p-normalization with a scaling factor of 10K
+   
+   2. `FindVariableFeatures()`: identification of 2K HVG
+      
+   3. `ScaleData()`: standardization of the 2K HVG
+         
+   4. `RunPCA()`: computation of a PCA with the 2K HVG standardized
+   
+   5. `RunUMAP()`: computation of a UMAP using the first `dims` of the previously computed PCA
+
+```{r joint dimred analysis}
+## Joint analysis
+
+# Standard Seurat upstream workflow
+seu <- NormalizeData(seu)
+seu <- FindVariableFeatures(seu)
+seu <- ScaleData(seu)
+seu <- RunPCA(seu)
+seu <- RunUMAP(seu, dims = 1:30, reduction = "pca", reduction.name = "umap.unintegrated")
+```
+
+Plot the PCA and UMAP side-by-side below. 
+
+```{r plot joint dimreds, fig.width=10, fig.height=4}
+## Plot jointly dimreds
+pca.unint <- DimPlot(seu, reduction = "pca", group.by = "stim")
+umap.unint <- DimPlot(seu, reduction = "umap.unintegrated", group.by = "stim")
+pca.unint + umap.unint
+```
+
+<br>
+
+### Celltype markers
+
+_(5 min)_
+
+>AIM: Check if cells from different datasets share well-known cell-specific markers. 
+
+<br>
+
+Plot below some cell-specific PBMC cell type markers. Feel free to add other genes you might be interested in checking.  
+
+```{r joint celltype markers}
+## Joint celltype markers
+
+# List of PBMC cell markers
+markers.plot <- list(
+  # "pbmc" = c("CD3D", "CREM", "HSPH1", "SELL", "GIMAP5", "CACYBP", "GNLY", "NKG7", "CCL5",
+  #            "CD8A", "MS4A1", "CD79A", "MIR155HG", "NME1", "FCGR3A", "VMO1", "CCL2", "S100A9", 
+  #            "HLA-DQA1", "GPR183", "PPBP", "GNG11", "HBA2", "HBB", "TSPAN13", "IL3RA", "IGJ", 
+  #            "PRSS57"), 
+  "pbmc" = c("CD3D", "NKG7", "CD8A", "MS4A1", "CD79A", "FCGR3A")
+)
+
+# Plot
+pbmc.markers.unint.plot <- FeaturePlot(seu, features = markers.plot$pbmc, split.by = "stim", 
+                                       max.cutoff = 3, cols = c("grey", "red"), 
+                                       reduction = "umap.unintegrated", ncol = 4, 
+                                       pt.size = 0.1)
+```
+
+```{r plot joint celltype markers, fig.width=8, fig.height=18}
+## Plot jointly celltype markers
+
+# Print 
+pbmc.markers.unint.plot
+```
+
+<br>
+
+### Manual cell annotation
+
+_(15 min)_
+
+>AIM: Check the number of differentially expressed genes for dataset-specific clusters shared between datasets. 
+
+<br>
+
+Split the `Seurat` object into a list of two `Seurat` objects (one per dataset) and run the standard `Seurat` workflow for each. After calculating the PCA, run `FindNeighbors()` and `FindClusters()` sequentially to perform graph-based clustering for each dataset, in order to determine the dataset-specific cluster markers.
+
+```{r independent sample analysis}
+## Independent sample analysis
+
+# Split Seurat object into two batch on 'stim' label identity
+seu.list <- SplitObject(object = seu, split.by = "stim")
+
+# Standard Seurat upstream workflow
+seu.list <- lapply(X = seu.list, FUN = function(x) {
+  x <- NormalizeData(x)
+  x <- FindVariableFeatures(x)
+  x <- ScaleData(x)
+  x <- RunPCA(x)
+  x <- FindNeighbors(x, dims = 1:15, reduction = "pca")
+  x <- FindClusters(x, resolution = 0.8, cluster.name = "unintegrated_clusters")
+  x <- RunUMAP(x, dims = 1:15, reduction = "pca", reduction.name = "umap.unintegrated")
+})
+```
+
+Plot UMAPs for both datasets highlighting the `Seurat` clusters found for each. 
+
+```{r plot independent sample analysis clusters, fig.width=8.5, fig.height=4}
+## Plot independent sample analysis clusters
+umap.ind.samp.unint <- lapply(X = seu.list, FUN = function(x) {
+  DimPlot(x, reduction = "umap.unintegrated", group.by = "unintegrated_clusters", pt.size = 0.1, label = TRUE)
+})
+umap.ind.samp.unint$CTRL + umap.ind.samp.unint$STIM
+```
+
+<br>
+
+Compute the differentially expressed genes for every cluster in every dataset and retrieve only the upregulated genes for every cluster. Then pick the top 50 upregulated genes per cluster based on log2 fold-change, among those you were statistically significant, i.e., FDR<0.05, and calculate the intersection of cluster genes between datasets.
+
+```{r independent sample analysis - dge}
+## Independent sample analysis: DGE
+
+# Differential gene expression analysis per cluster 
+dge.markers.unint <- lapply(X = seu.list, FUN = function(x) {
+  FindAllMarkers(object = x, assay = "RNA", slot = "data", 
+                 logfc.threshold = 0.25, min.pct = 0.25, 
+                 min.cells.feature = 10, only.pos = TRUE)
+})
+
+# Pick the top50 upregulated genes per cluster based on log2FC
+top50.up.cluster <- lapply(X = dge.markers.unint, FUN = function(x) {
+  x %>% 
+    filter(p_val_adj<0.05) %>% 
+    group_by(cluster) %>% 
+    arrange(desc(avg_log2FC)) %>% 
+    slice_head(n=50)  %>% 
+    split(., .$cluster)
+}) 
+
+# Check intersection of top50 marker genes between clusters across batches
+shared.genes <- list()
+for (i in names(top50.up.cluster$CTRL)) {
+  for (ii in names(top50.up.cluster$STIM)) {
+    shared.genes[[paste0("CTRL", i)]][[paste0("STIM", ii)]] <- intersect(top50.up.cluster$CTRL[[i]]$gene, 
+                                                                             top50.up.cluster$STIM[[ii]]$gene)
+  }
+}
+# Table with number of genes shared between CTRL vs STIM clusters for the top50 upregulated genes per cluster
+shared.genes.table <- as.data.frame(
+  lapply(X = shared.genes, FUN = function(x) {
+    unlist(lapply(x, length))
+  })
+)
+
+```
+
+Print the confusion matrix of cluster markers shared between datasets. 
+
+```{r independent sample analysis - dge (table)}
+## Print table
+knitr::kable(shared.genes.table)
+```
+
+<br>
+
+Plot the previous table as a heatmap. 
+
+```{r independent sample analysis - dge (plot), fig.width=5, fig.height=3.5}
+## Plot independent sample analysis clusters
+ComplexHeatmap::Heatmap(matrix = as.matrix(shared.genes.table), name = "Shared gene no.", 
+                        cluster_columns = FALSE, cluster_rows = FALSE)
+```
+
+<br>
+
+### Automatic cell annotation
+
+_(10 min)_
+
+>AIM: Check if datasets share cell types by predicting cell type labels for both datasets. 
+
+<br>
+
+This exercise requires to run [CellTypist](https://www.celltypist.org/). `CellTypist` is a python package that can be run using python, the command-line or online through their website. For convenience, run `CellTypist` online. 
+
+First export the `Seurat` R object as `anndata` `h5ad` python-compatible object with the function `zellkonverter::writeH5AD()` by running the R code chunk below. This will create a file named `ifnb_celltypist.h5ad` under the directory: `results/cross_tissue_task/objects`. Next, go to the `CellTypist` website: [https://www.celltypist.org/](https://www.celltypist.org/). Put your own e-mail address. Select the model `Immune_All_Low.pkl` which comprises a model for annotation of immune cells. Allow majority voting. Finally, upload the file `ifnb_celltypist.h5ad`.  
+
+```{r automatic cell annotation}
+## Automatic cell annotation
+file.name <- file.path(res.dir[3], "ifnb_celltypist.h5ad")
+cat("Exporting Seurat object as '.h5ad' format to:", gsub("\\../", "", file.name), "\n")
+zellkonverter::writeH5AD(sce = as.SingleCellExperiment(seu), file = file.name, X_name = "logcounts")
+```
+
+You should receive an e-mail with a download link with the result. Download the result - `predictions.tar.gz` - and put the result into the directory: `results/cross_tissue_task/tables`. In alternative, you can substitute the url below (because it's only valid for 7 days) by copying and pasting the link you received in your own e-mail and replace the variable `FALSE` by `TRUE` for the variable `use.url`.
+
+Plot the predicted labels for both data sets. 
+
+```{r automatic cell annotation - plot, fig.width=9, fig.height=4}
+## Plot labels from CellTypist
+
+# Download predictions
+use.url <- FALSE # if you wanna use the url, replace the url by the url you received in your e-mail and replace FALSE by TRUE
+if (use.url) { # download: url only valid for 7 days
+  url <- "https://celltypist.cog.sanger.ac.uk/uploads/17baab62-d10e-4de6-a4ed-b71073518329/predictions.tar.gz?AWSAccessKeyId=C068AUIY7F6SNEJUTEPA&Signature=Ss%2FNyQOcte7QS06j8tnl2s2YDVQ%3D&Expires=1720194680"
+  download.file(url = url, destfile = file.path(res.dir[2], "predictions.tar.gz"))
+}
+# Decompress the file with predictions 
+untar(tarfile = file.path(res.dir[2], "predictions.tar.gz"), exdir = res.dir[2])
+
+# Add predictions to Seurat object
+seu@meta.data[,c("predicted_labels", "over_clustering", "majority_voting")] <- read.table(file = file.path(res.dir[2],
+                                                                                                           "predicted_labels.csv"),
+                                                                                          header = TRUE, sep = ",", row.names = 1)
+
+# Plot predictions
+DimPlot(object = seu, reduction = "umap.unintegrated", group.by = "majority_voting", 
+        split.by = "stim", pt.size = 0.1, label = TRUE)
+
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (3) Integrate datasets
+
+_(10 min)_
+
+>AIM: Compare different integration methods. 
+
+<br>
+
+First, `split` the layers of data by batch before performing integration. Then, apply the standard `Seurat` workflow. Finally, call the function `IntegrateLayers()` to integrate the datasets. In this function you can specify the method you want to run by providing the integration method function. 
+
+`Seurat` provides three methods: CCA (`CCAIntegration`), RPCA (`RPCAIntegration`) and Harmony (`HarmonyIntegration`). In addition, other methods can be called by using functions from `SeuratWrappers` such as: FastMNN (`FastMNNIntegration`) or scVI (`scVIIntegration`) among others. Harmony (from the `harmony` R package), FastMNN (from the `batchelor` R package) and scVI (python package installed with conda) need to be installed independently from `Seurat`. 
+
+Run the R chunk code below to run the integration methods: CCA, RPCA, Harmony and FastMNN (you can try to run scVI if you've it installed in your system). Join the layers back after integration to project the integrated data onto UMAP. The UMAP highlights the `stim` and ground-truth `seurat_annotations` labels. 
+
+```{r integration}
+## Perform integration
+
+# Split layers for integration
+seu[["RNA"]] <- split(x = seu[["RNA"]], f = seu$stim)
+
+# Standard workflow
+seu <- NormalizeData(seu)
+seu <- FindVariableFeatures(seu)
+seu <- ScaleData(seu)
+seu <- RunPCA(seu)
+
+# Integrate layers
+int.methods <- c("CCA" = "CCAIntegration", "RPCA" = "RPCAIntegration", 
+                 "Harmony" = "HarmonyIntegration", "FastMNN" = "FastMNNIntegration", 
+                 "scVI" = "scVIIntegration")
+
+for (m in names(int.methods)[1:4]) {
+  cat("\nRunning integration method", m, "...\n")
+  int.dimred <- paste0("integrated.", m)
+  umap.dimred <- paste0("umap.", m)
+  # Integration
+  if (m=="scVI") {
+    seu <- IntegrateLayers(object = seu, method = get(eval(substitute(int.methods[m]))), 
+                         orig.reduction = "pca", 
+                         new.reduction = int.dimred,
+                         conda_env = "~/miniconda3/envs/scvi-env", # substitute this by your installation 
+                         verbose = TRUE)
+  } else {
+    seu <- IntegrateLayers(object = seu, method = get(eval(substitute(int.methods[m]))), 
+                         orig.reduction = "pca", 
+                         new.reduction = int.dimred,
+                         verbose = TRUE)
+  }
+
+}
+
+# Re-join layers after integration
+seu[["RNA"]] <- JoinLayers(seu[["RNA"]])
+
+# Run UMAP for every integration method
+int.umaps.plots <- list()
+for (m in names(int.methods)[1:4]) {
+  cat("\nRunning UMAP for", m, "integrated result...\n")
+  int.dimred <- paste0("integrated.", m)
+  umap.dimred <- paste0("umap.", m)
+  seu <- RunUMAP(seu, dims = 1:30, reduction = int.dimred, reduction.name = umap.dimred)
+  int.umaps.plots[[m]] <-  DimPlot(object = seu, reduction = umap.dimred, group.by = c("stim", "seurat_annotations"), 
+                                   combine = FALSE, label.size = 2)
+}
+
+# Save Seurat object
+saveRDS(object = seu, file = file.path(res.dir[3], "seu_integrated.rds"))
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+## (4) Assess integration
+
+_(15 min)_
+
+>AIM: Assess integration qualitatively and quantitatively through dimensional reduction visualizations and LISI scores.  
+
+<br>
+
+### Qualitative viz
+
+<br>
+
+Plot the integrated embeddings below highlighting the `stim` and ground-truth `seurat_annotations` labels. 
+
+```{r assess qualitative integration - plot, fig.width=14, fig.height=18}
+## Assess integration by printing the plots using the "batch" and "cell_type" (ground-truth) labels
+wrap_plots(c(int.umaps.plots$CCA, int.umaps.plots$RPCA, int.umaps.plots$Harmony, int.umaps.plots$FastMNN),
+           ncol = 2, byrow = TRUE)
+```
+
+<br>
+
+<br>
+
+### Quantitative metrics
+
+<br>
+
+Run the code below to compute the i/cLISI scores for every integrated embedding with the function `getIntegrationMetrics()` from the package `scIntegrationMetrics` (read more about the meaning of these metrics [here](https://github.com/carmonalab/scIntegrationMetrics)).
+
+```{r assess quantitative integration}
+## Assess quantitatively integration with scIntegrationMetrics
+
+# Calculate metrics
+int.mthds.names <- paste0("integrated.", names(int.methods)[1:4])
+names(int.mthds.names) <- int.mthds.names
+metrics <- list()
+for (m in int.mthds.names) {
+  key <- gsub("integrated.", "", m)
+  cat("Computing i/cLISI metrics for integration method:", gsub("integrated.", "", key), "\n")
+  metrics[[key]] <- getIntegrationMetrics(seu, meta.label = "seurat_annotations", meta.batch = "stim",
+                                          method.reduction = m, metrics = c("iLISI", "norm_iLISI", 
+                                                                            #"CiLISI", "CiLISI_means", 
+                                                                            "norm_cLISI", "norm_cLISI_means"))
+}
+# Join metrics
+metrics <- as.data.frame(do.call(cbind, metrics))
+```
+
+Print the result below. 
+
+```{r assess quantitative integration - table}
+# Print table
+knitr::kable(metrics)
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
+
+#### R packages used and respective versions
+
+<br>
+
+```{r References, message=FALSE, warning=FALSE, paged.print=FALSE}
+## R packages and versions used in these analyses
+sessionInfo()
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+<br>
