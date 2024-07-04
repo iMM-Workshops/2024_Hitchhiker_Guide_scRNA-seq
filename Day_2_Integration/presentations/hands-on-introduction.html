@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="António Sousa" />
+  <meta name="dcterms.date" content="2024-09-07" />
+  <title>Introduction to the integration hands-on</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="hands-on-introduction_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="hands-on-introduction_files/reveal.js-3.3.0.1/css/theme/blood.css" id="theme">
+
+<style type="text/css">
+.reveal section img {
+  background: rgba(255, 255, 255, 0.85);
+}
+</style>
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+    <link rel="stylesheet" href="config/css/config.css"/>
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+    <script src="hands-on-introduction_files/header-attrs-2.27/header-attrs.js"></script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Introduction to the integration hands-on</h1>
+  <h1 class="subtitle">The Hitchhiker’s Guide to scRNA-seq, iMM</h1>
+    <h2 class="author">António Sousa</h2>
+    <h3 class="date">09/07/2024</h3>
+</section>
+
+<section>
+<section id="seurat" class="title-slide slide level1">
+<h1>Seurat</h1>
+
+</section>
+<section class="slide level2">
+
+<h3 id="r-lists">R <code>list</code>s</h3>
+<p>A <code>list</code> in R is an object that can comprise different data types of different lengths. The elements in the list are ordered and changeable.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set seed</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># student class sizes </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>student_class_sizes <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">15</span><span class="sc">:</span><span class="dv">30</span>, <span class="dv">3</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># list with 3 classes with student class names  </span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>student_class_names <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;class1&quot;</span> <span class="ot">=</span> randomNames<span class="sc">::</span><span class="fu">randomNames</span>(<span class="at">n =</span> student_class_sizes[<span class="dv">1</span>]), </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;class2&quot;</span> <span class="ot">=</span> randomNames<span class="sc">::</span><span class="fu">randomNames</span>(<span class="at">n =</span> student_class_sizes[<span class="dv">2</span>]),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;class3&quot;</span> <span class="ot">=</span> randomNames<span class="sc">::</span><span class="fu">randomNames</span>(<span class="at">n =</span> student_class_sizes[<span class="dv">3</span>]))</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<p><code>List</code>s can be queried or indexed by name or index position number in the <code>list</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_class_names<span class="sc">$</span>class1) <span class="co"># first element in the list retrieved by name</span></span></code></pre></div>
+<pre><code>## [1] &quot;Alexander, Olivia&quot;   &quot;Garcia, Norman&quot;      &quot;al-Badour, Naafoora&quot;
+## [4] &quot;Rosen, Stephanie&quot;    &quot;Tilmon, Nicolette&quot;   &quot;Ledbetter, Matthew&quot;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(student_class_names[[<span class="dv">2</span>]]) <span class="co"># second element in the list retrieved by the index number</span></span></code></pre></div>
+<pre><code>## [1] &quot;Chong, David&quot;        &quot;Soukup, Austin&quot;      &quot;Jeffers, Megan&quot;     
+## [4] &quot;Culhane, Tiffany&quot;    &quot;Cao, Lars&quot;           &quot;Worley, Christopher&quot;</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="lapply-function"><code>lapply</code> function</h3>
+<p><code>lapply</code> is a function that applies a function to every element in a list returning the result into a list.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check the size/length of every class in the list</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>class_size <span class="ot">&lt;-</span> <span class="fu">lapply</span>(student_class_names, length)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>class_size</span></code></pre></div>
+<pre><code>## $class1
+## [1] 29
+## 
+## $class2
+## [1] 30
+## 
+## $class3
+## [1] 17</code></pre>
+</section>
+<section class="slide level2">
+
+<p>The <code>FUN</code> parameter can take any existing function or a customized function.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the length, i.e., no. of characters, of the longest name in every class</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>longest_name <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="at">X =</span> student_class_names, <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max</span>( <span class="fu">nchar</span>(x) ) <span class="co"># nested functions</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>longest_name</span></code></pre></div>
+<pre><code>## $class1
+## [1] 21
+## 
+## $class2
+## [1] 20
+## 
+## $class3
+## [1] 19</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="dplyr-syntax"><code>dplyr</code> syntax</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># dplyr syntax</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;dplyr&quot;</span>) <span class="co"># data wrangling</span></span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the &#39;iris&#39; dataset</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(iris)</span></code></pre></div>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa</code></pre>
+</section>
+<section class="slide level2">
+
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## dplyr syntax</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># get the mean for all numeric columns</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>iris <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_if</span>(is.numeric, mean)</span></code></pre></div>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 1     5.843333    3.057333        3.758    1.199333</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the mean of &#39;Sepal.Length&#39; when &#39;Petal.Length&#39; is higher than 3.7</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>iris <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Petal.Length <span class="sc">&gt;</span> <span class="fl">3.7</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Sepal.Length.Mean =</span> <span class="fu">mean</span>(Sepal.Length))</span></code></pre></div>
+<pre><code>##   Sepal.Length.Mean
+## 1          6.337634</code></pre>
+</section>
+<section id="input" class="slide level2">
+<h2>Input</h2>
+</section>
+<section class="slide level2">
+
+<p><small>10X scRNA-seq data processed with <code>CellRanger</code> software can be imported into R/Seurat by specifying the folder holding the following three files (they can be compressed as well): <code>barcodes.tsv</code>, <code>matrix.tsv</code>, <code>genes.tsv</code>.</small></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 10X data directory (downloaded from 10X website - see links below):</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc6k</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/pbmc8k</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>data10X.dir <span class="ot">&lt;-</span> <span class="st">&quot;../hands-on/data/10x_3pV1_2&quot;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>samples<span class="fl">.10</span>X <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;pbmc6k_3pV1&quot;</span>, <span class="st">&quot;pbmc8k_3pV2&quot;</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>samples<span class="fl">.10</span>X.dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(data10X.dir, samples<span class="fl">.10</span>X)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(samples<span class="fl">.10</span>X.dir) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;V1&quot;</span>, <span class="st">&quot;V2&quot;</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>samples<span class="fl">.10</span>X.dir</span></code></pre></div>
+<pre><code>##                                        V1 
+## &quot;../hands-on/data/10x_3pV1_2/pbmc6k_3pV1&quot; 
+##                                        V2 
+## &quot;../hands-on/data/10x_3pV1_2/pbmc8k_3pV2&quot;</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(samples<span class="fl">.10</span>X.dir)</span></code></pre></div>
+<pre><code>## [1] &quot;barcodes.tsv&quot; &quot;barcodes.tsv&quot; &quot;genes.tsv&quot;    &quot;genes.tsv&quot;    &quot;matrix.mtx&quot;  
+## [6] &quot;matrix.mtx&quot;</code></pre>
+</section>
+<section class="slide level2">
+
+<p><small>Import 10X samples from the same project into <code>Seurat</code>.</small></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import package</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;Seurat&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import 10X data as sparse matrix &amp; create Seurat object</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">Read10X</span>(<span class="at">data.dir =</span> samples<span class="fl">.10</span>X.dir)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">CreateSeuratObject</span>(<span class="at">counts =</span> counts)</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<p><small>Import 10X samples from the different projects, i.e., processed independently with <code>CellRanger</code>, into <code>Seurat</code>.</small></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import 10X samples as individual 10X samples</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>seu.list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="at">X =</span> samples<span class="fl">.10</span>X.dir, <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">CreateSeuratObject</span>(<span class="at">counts =</span> <span class="fu">Read10X</span>(<span class="at">data.dir =</span> x))</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
+<pre><code>## Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+## (&#39;-&#39;)
+## Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+## (&#39;-&#39;)</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># merge samples &amp; counts layer</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">merge</span>(<span class="at">x =</span> seu.list[[<span class="dv">1</span>]], <span class="at">y =</span> seu.list[[<span class="dv">2</span>]], <span class="at">add.cell.ids =</span> <span class="fu">names</span>(seu.list))</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>seu[[<span class="st">&quot;RNA&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">JoinLayers</span>(<span class="at">object =</span> seu[[<span class="st">&quot;RNA&quot;</span>]])</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>seu</span></code></pre></div>
+<pre><code>## An object of class Seurat 
+## 36116 features across 13800 samples within 1 assay 
+## Active assay: RNA (36116 features, 0 variable features)
+##  1 layer present: counts</code></pre>
+</section>
+<section class="slide level2">
+
+<p><small>Export a <code>Seurat</code> object in <code>RDS</code> format.</small></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># export Seurat R object as .RDS file</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(<span class="at">object =</span> seu, <span class="at">file =</span> <span class="fu">file.path</span>(data10X.dir, <span class="st">&quot;seurat.rds&quot;</span>))</span></code></pre></div>
+<p><small>Import a <code>Seurat</code> object saved as <code>RDS</code> format.</small></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import RDS Seurat R object </span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file =</span> <span class="fu">file.path</span>(data10X.dir, <span class="st">&quot;seurat.rds&quot;</span>))</span></code></pre></div>
+</section>
+<section id="seuratobject" class="slide level2">
+<h2>SeuratObject</h2>
+</section>
+<section class="slide level2">
+
+<h3 id="seuratobject-1"><code>SeuratObject</code></h3>
+<p><small><code>SeuratObject</code> is a S4 class object. The different layers of information can be accessed with <code>Seurat</code> functions or using the accessor <code>@</code> (see examples below).</small></p>
+</section>
+<section class="slide level2">
+
+<h3 id="assays"><span class="citation" data-cites="assays">@assays</span></h3>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seurat assays slot</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>seu<span class="sc">@</span>assays</span></code></pre></div>
+<pre><code>## $RNA
+## Assay (v5) data with 36116 features for 13800 cells
+## First 10 features:
+##  MIR1302-10, FAM138A, OR4F5, RP11-34P13.7, RP11-34P13.8, AL627309.1,
+## RP11-34P13.14, RP11-34P13.9, AP006222.2, RP4-669L17.10 
+## Layers:
+##  counts</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="meta.data"><span class="citation" data-cites="meta.data">@meta.data</span></h3>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seurat meta.data slot</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seu<span class="sc">@</span>meta.data)</span></code></pre></div>
+<pre><code>##                        orig.ident nCount_RNA nFeature_RNA
+## V1_AAACATACAACCAC-1 SeuratProject       2029          642
+## V1_AAACATACACCAGT-1 SeuratProject       2835         1031
+## V1_AAACATACCCGTAA-1 SeuratProject       1804          688
+## V1_AAACATACCTAAGC-1 SeuratProject       1789          621
+## V1_AAACATACCTTCCG-1 SeuratProject       3155          928
+## V1_AAACATACGCGAAG-1 SeuratProject       3416         1190</code></pre>
+</section>
+<section class="slide level2">
+
+<p><small>Cell metadata can be added to the <code>seu@meta.data</code> slot.</small></p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add more meta data: </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">#import &quot;Source Data Fig.3&quot; excel file with cell annotations from Harmony paper: https://doi.org/10.1038/s41592-019-0619-0</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>meta.data <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="at">path =</span> <span class="fu">file.path</span>(data10X.dir, <span class="st">&quot;41592_2019_619_MOESM9_ESM.xlsx&quot;</span>))</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>meta.data <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(meta.data, dataset <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;three_prime_v1&quot;</span>, <span class="st">&quot;three_prime_v2&quot;</span>))</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>meta.data <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(meta.data)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(meta.data) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">paste0</span>(<span class="fu">toupper</span>(<span class="fu">gsub</span>(<span class="st">&quot;three_prime_&quot;</span>, <span class="st">&quot;&quot;</span>, meta.data<span class="sc">$</span>dataset)), <span class="st">&quot;_&quot;</span>), </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>                              meta.data<span class="sc">$</span>cell_id, <span class="st">&quot;-1&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>meta.data <span class="ot">&lt;-</span> meta.data[<span class="sc">!</span> <span class="fu">is.na</span>(meta.data<span class="sc">$</span>cell_subtype), ] <span class="co"># remove cells not annotated</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">subset</span>(seu, <span class="at">cells =</span> <span class="fu">row.names</span>(meta.data)) <span class="co"># removed 754 cells (total: 13,046)</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>seu<span class="sc">$</span>cell_type <span class="ot">&lt;-</span> meta.data[<span class="fu">colnames</span>(seu), <span class="st">&quot;cell_subtype&quot;</span>] <span class="co"># adding cell annotations to Seurat meta data</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>seu<span class="sc">$</span>batch <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="at">pattern =</span> <span class="st">&quot;^V1_&quot;</span>, <span class="at">x =</span> <span class="fu">colnames</span>(seu)), <span class="st">&quot;V1&quot;</span>, <span class="st">&quot;V2&quot;</span>)</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seu<span class="sc">@</span>meta.data)</span></code></pre></div>
+<pre><code>##                        orig.ident nCount_RNA nFeature_RNA cell_type batch
+## V1_AAACATACAACCAC-1 SeuratProject       2029          642  cd8naive    V1
+## V1_AAACATACACCAGT-1 SeuratProject       2835         1031    mono14    V1
+## V1_AAACATACCCGTAA-1 SeuratProject       1804          688  cd8naive    V1
+## V1_AAACATACCTAAGC-1 SeuratProject       1789          621  cd4naive    V1
+## V1_AAACATACCTTCCG-1 SeuratProject       3155          928    mono14    V1
+## V1_AAACATACGCGAAG-1 SeuratProject       3416         1190      bmem    V1</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="graphsneighborsreductions"><span class="citation" data-cites="graphs/neighbors/reductions">@graphs/neighbors/reductions</span></h3>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># other data slots in Seurat object</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>seu<span class="sc">@</span>graphs</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>seu<span class="sc">@</span>neighbors</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>seu<span class="sc">@</span>reductions</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="standard-workflow" class="title-slide slide level1">
+<h1>Standard workflow</h1>
+
+</section>
+<section class="slide level2">
+
+<h3 id="standard-workflow-1">Standard workflow</h3>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard Seurat upstream workflow</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">NormalizeData</span>(seu)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">FindVariableFeatures</span>(seu)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">ScaleData</span>(seu)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">RunPCA</span>(seu)</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<h3 id="dimensional-reduction">Dimensional reduction</h3>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot jointly dimreds</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run UMAP</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">RunUMAP</span>(seu, <span class="at">dims =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">reduction =</span> <span class="st">&quot;pca&quot;</span>, <span class="at">reduction.name =</span> <span class="st">&quot;umap.unintegrated&quot;</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>unint.dimreds <span class="ot">&lt;-</span> <span class="fu">list</span>() </span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="st">&quot;pca_batch&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;pca&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;batch&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="st">&quot;pca_cell_type&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;pca&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;cell_type&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="st">&quot;umap_batch&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;umap.unintegrated&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;batch&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="st">&quot;umap_cell_type&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;umap.unintegrated&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;cell_type&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<h3 id="batch-assessment-pca">Batch assessment (PCA)</h3>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print UMAPs</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="dv">1</span>]] <span class="sc">+</span> unint.dimreds[[<span class="dv">2</span>]]   </span></code></pre></div>
+<p><img src="hands-on-introduction_files/figure-revealjs/unintegrated%20dimreds%20-%20pcas-1.png" width="864" /></p>
+</section>
+<section class="slide level2">
+
+<h3 id="batch-assessment-umap">Batch assessment (UMAP)</h3>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print UMAPs</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="dv">3</span>]] <span class="sc">+</span> unint.dimreds[[<span class="dv">4</span>]]   </span></code></pre></div>
+<p><img src="hands-on-introduction_files/figure-revealjs/dimreds%20-%20umaps-1.png" width="864" /></p>
+</section>
+<section class="slide level2">
+
+<h3 id="clustering">Clustering</h3>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># graph-based clustering</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">FindNeighbors</span>(seu, <span class="at">dims =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">reduction =</span> <span class="st">&quot;pca&quot;</span>) <span class="co"># shared nearest-neighbor graph</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">FindClusters</span>(seu, <span class="at">resolution =</span> <span class="dv">2</span>, <span class="at">cluster.name =</span> <span class="st">&quot;unintegrated_clusters&quot;</span>) <span class="co"># cell population detection - Louvain algorithm</span></span></code></pre></div>
+<pre><code>## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+## 
+## Number of nodes: 13046
+## Number of edges: 558289
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 10 random starts: 0.8521
+## Number of communities: 32
+## Elapsed time: 1 seconds</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="st">&quot;umap_clusters&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;umap.unintegrated&quot;</span>, </span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">group.by =</span> <span class="st">&quot;unintegrated_clusters&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>unint.dimreds[[<span class="dv">3</span>]] <span class="sc">+</span> unint.dimreds[[<span class="dv">4</span>]] <span class="sc">+</span> unint.dimreds[[<span class="dv">5</span>]]</span></code></pre></div>
+<p><img src="hands-on-introduction_files/figure-revealjs/clustering%20-%20print-1.png" width="1344" /></p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="integration" class="title-slide slide level1">
+<h1>Integration</h1>
+
+</section>
+<section class="slide level2">
+
+<h3 id="split-layers">Split <code>layers</code></h3>
+<p><small>Split <code>layers</code> before integration by providing the cell <code>batch</code> label identity.</small></p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># how does it look the object before splitting</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>seu</span></code></pre></div>
+<pre><code>## An object of class Seurat 
+## 36116 features across 13046 samples within 1 assay 
+## Active assay: RNA (36116 features, 2000 variable features)
+##  3 layers present: counts, data, scale.data
+##  2 dimensional reductions calculated: pca, umap.unintegrated</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split the &#39;layers&#39; by &#39;batch&#39;</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>seu[[<span class="st">&quot;RNA&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">split</span>(<span class="at">x =</span> seu[[<span class="st">&quot;RNA&quot;</span>]], <span class="at">f =</span> seu<span class="sc">$</span>batch)</span></code></pre></div>
+<pre><code>## Splitting &#39;counts&#39;, &#39;data&#39; layers. Not splitting &#39;scale.data&#39;. If you would like to split other layers, set in `layers` argument.</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seurat object after split</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>seu</span></code></pre></div>
+<pre><code>## An object of class Seurat 
+## 36116 features across 13046 samples within 1 assay 
+## Active assay: RNA (36116 features, 2000 variable features)
+##  5 layers present: counts.V1, counts.V2, scale.data, data.V1, data.V2
+##  2 dimensional reductions calculated: pca, umap.unintegrated</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="integration-workflow">Integration workflow</h3>
+<p><small>Different integration methods can be called from <code>Seurat</code> <code>IntegrateLayers()</code> function: <code>CCAIntegration</code> and <code>RPCAIntegration</code> (from <code>Seurat</code>), <code>HarmonyIntegration</code>, <code>FastMNNIntegration</code> and <code>scVIIntegration</code> (wrapper functions from <code>SeuratWrappers</code> - the packages from the respective methods need to be installed first).</small></p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># integration Seurat workflow</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">NormalizeData</span>(seu)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">FindVariableFeatures</span>(seu)</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">ScaleData</span>(seu)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">RunPCA</span>(seu)</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">IntegrateLayers</span>(<span class="at">object =</span> seu, </span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">method =</span> CCAIntegration, <span class="co"># RPCAIntegration / HarmonyIntegration / FastMNNIntegration / scVIIntegration</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">orig.reduction =</span> <span class="st">&quot;pca&quot;</span>, </span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">new.reduction =</span> <span class="st">&quot;integrated.cca&quot;</span>)</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>seu[[<span class="st">&quot;RNA&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">JoinLayers</span>(seu[[<span class="st">&quot;RNA&quot;</span>]])</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<h3 id="clustering-1">Clustering</h3>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster integrated dimensional reduction</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">FindNeighbors</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;integrated.cca&quot;</span>, <span class="at">dims =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>)</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">FindClusters</span>(seu, <span class="at">resolution =</span> <span class="dv">2</span>, <span class="at">cluster.name =</span> <span class="st">&quot;integrated_clusters&quot;</span>)</span></code></pre></div>
+<pre><code>## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+## 
+## Number of nodes: 13046
+## Number of edges: 641240
+## 
+## Running Louvain algorithm...
+## Maximum modularity in 10 random starts: 0.7902
+## Number of communities: 28
+## Elapsed time: 2 seconds</code></pre>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>seu</span></code></pre></div>
+<pre><code>## An object of class Seurat 
+## 36116 features across 13046 samples within 1 assay 
+## Active assay: RNA (36116 features, 2000 variable features)
+##  3 layers present: data, counts, scale.data
+##  3 dimensional reductions calculated: pca, umap.unintegrated, integrated.cca</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="dimensional-reduction-1">Dimensional reduction</h3>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot jointly dimreds</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Run UMAP</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>seu <span class="ot">&lt;-</span> <span class="fu">RunUMAP</span>(seu, <span class="at">dims =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">reduction =</span> <span class="st">&quot;integrated.cca&quot;</span>, <span class="at">reduction.name =</span> <span class="st">&quot;umap.integrated&quot;</span>)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>int.dimreds <span class="ot">&lt;-</span> <span class="fu">list</span>() </span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>int.dimreds[[<span class="st">&quot;umap_batch&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;umap.integrated&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;batch&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>int.dimreds[[<span class="st">&quot;umap_cell_type&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;umap.integrated&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;cell_type&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>int.dimreds[[<span class="st">&quot;umap_clusters&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu, <span class="at">reduction =</span> <span class="st">&quot;umap.integrated&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;integrated_clusters&quot;</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>int.dimreds[[<span class="dv">1</span>]] <span class="sc">+</span> int.dimreds[[<span class="dv">2</span>]] <span class="sc">+</span> int.dimreds[[<span class="dv">3</span>]]</span></code></pre></div>
+<p><img src="hands-on-introduction_files/figure-revealjs/integrated%20dimreds-1.png" width="1344" /></p>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="reference-mapping" class="title-slide slide level1">
+<h1>Reference-mapping</h1>
+
+</section>
+<section class="slide level2">
+
+<h3 id="azimuth-references">Azimuth references</h3>
+<p><small><code>SeuratData</code> provides some ready to use <code>Azimuth</code> references.</small></p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Reference-mapping with Azimuth</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Import library</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;Azimuth&quot;</span>)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SeuratData&quot;</span>) <span class="co"># contains some Azimuth references</span></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Azimuth references available in SeuratData</span></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>SeuratData<span class="sc">::</span><span class="fu">AvailableData</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">&quot;ref.&quot;</span>, <span class="fu">row.names</span>(.), ))</span></code></pre></div>
+<pre><code>##                                  Dataset Version                        Summary
+## adiposeref.SeuratData         adiposeref   1.0.0     Azimuth Reference: adipose
+## bonemarrowref.SeuratData   bonemarrowref   1.0.0  Azimuth Reference: bonemarrow
+## fetusref.SeuratData             fetusref   1.0.0       Azimuth Reference: fetus
+## heartref.SeuratData             heartref   1.0.0       Azimuth Reference: heart
+## humancortexref.SeuratData humancortexref   1.0.0 Azimuth Reference: humancortex
+## kidneyref.SeuratData           kidneyref   1.0.2      Azimuth Reference: kidney
+## lungref.SeuratData               lungref   2.0.0        Azimuth Reference: lung
+## mousecortexref.SeuratData mousecortexref   1.0.0 Azimuth Reference: mousecortex
+## pancreasref.SeuratData       pancreasref   1.0.0    Azimuth Reference: pancreas
+## pbmcref.SeuratData               pbmcref   1.0.0        Azimuth Reference: pbmc
+## tonsilref.SeuratData           tonsilref   2.0.0      Azimuth Reference: tonsil
+##                           species       system ncells                   tech
+## adiposeref.SeuratData       human      adipose 160075 scRNA-seq and sNuc-seq
+## bonemarrowref.SeuratData    human   bonemarrow 297627                 10x v2
+## fetusref.SeuratData         human        fetus 377456                   &lt;NA&gt;
+## heartref.SeuratData         human        heart 656509 scRNA-seq and sNuc-seq
+## humancortexref.SeuratData   human motor cortex  76533                   &lt;NA&gt;
+## kidneyref.SeuratData        human       kidney  64693              snRNA-seq
+## lungref.SeuratData          human         lung 584884                   &lt;NA&gt;
+## mousecortexref.SeuratData   mouse motor cortex 159738                 10x v3
+## pancreasref.SeuratData      human     pancreas  35289                   &lt;NA&gt;
+## pbmcref.SeuratData          human         PBMC   2700                 10x v1
+## tonsilref.SeuratData        human       tonsil 377963              scRNA-seq
+##                           seurat default.dataset disk.datasets other.datasets
+## adiposeref.SeuratData       &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## bonemarrowref.SeuratData    &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## fetusref.SeuratData         &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## heartref.SeuratData         &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## humancortexref.SeuratData   &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## kidneyref.SeuratData        &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## lungref.SeuratData          &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## mousecortexref.SeuratData   &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## pancreasref.SeuratData      &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## pbmcref.SeuratData          &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+## tonsilref.SeuratData        &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;
+##                           notes Installed InstalledVersion
+## adiposeref.SeuratData      &lt;NA&gt;     FALSE             &lt;NA&gt;
+## bonemarrowref.SeuratData   &lt;NA&gt;     FALSE             &lt;NA&gt;
+## fetusref.SeuratData        &lt;NA&gt;     FALSE             &lt;NA&gt;
+## heartref.SeuratData        &lt;NA&gt;     FALSE             &lt;NA&gt;
+## humancortexref.SeuratData  &lt;NA&gt;     FALSE             &lt;NA&gt;
+## kidneyref.SeuratData       &lt;NA&gt;     FALSE             &lt;NA&gt;
+## lungref.SeuratData         &lt;NA&gt;     FALSE             &lt;NA&gt;
+## mousecortexref.SeuratData  &lt;NA&gt;     FALSE             &lt;NA&gt;
+## pancreasref.SeuratData     &lt;NA&gt;     FALSE             &lt;NA&gt;
+## pbmcref.SeuratData         &lt;NA&gt;      TRUE            1.0.0
+## tonsilref.SeuratData       &lt;NA&gt;     FALSE             &lt;NA&gt;</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="azimuth-reference-mapping">Azimuth reference-mapping</h3>
+<p><small><code>Azimuth</code> can be run by providing the <code>Seurat</code> object to be annotated and one of the <code>SeuratData</code> <code>Azimuth</code> references.</small></p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Azimuth reference-mapping</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>refmap <span class="ot">&lt;-</span> <span class="fu">RunAzimuth</span>(seu, <span class="at">reference =</span> <span class="st">&quot;pbmcref&quot;</span>) <span class="co"># installs &#39;pbmcref&#39; if does not exists</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>refmap</span></code></pre></div>
+<pre><code>## An object of class Seurat 
+## 36211 features across 13046 samples within 4 assays 
+## Active assay: RNA (36116 features, 2000 variable features)
+##  3 layers present: data, counts, scale.data
+##  3 other assays present: prediction.score.celltype.l1, prediction.score.celltype.l2, prediction.score.celltype.l3
+##  6 dimensional reductions calculated: pca, umap.unintegrated, integrated.cca, umap.integrated, integrated_dr, ref.umap</code></pre>
+</section>
+<section class="slide level2">
+
+<h3 id="project-query-onto-reference">Project query onto reference</h3>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="do">## project reference onto query</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>refmap.dimreds <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>refmap.dimreds[[<span class="st">&quot;umap_batch&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(refmap, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;batch&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>refmap.dimreds[[<span class="st">&quot;umap_cell_type&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(refmap, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;cell_type&quot;</span>,  <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>refmap.dimreds[[<span class="st">&quot;umap_preds_l1&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(refmap, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;predicted.celltype.l1&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>refmap.dimreds[[<span class="st">&quot;umap_preds_l2&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(refmap, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;predicted.celltype.l2&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>refmap.dimreds[[<span class="st">&quot;umap_preds_l3&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(refmap, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;predicted.celltype.l3&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>refmap.dimreds[[<span class="dv">1</span>]] <span class="sc">+</span> refmap.dimreds[[<span class="dv">2</span>]] <span class="sc">+</span> refmap.dimreds[[<span class="dv">3</span>]] <span class="sc">+</span> refmap.dimreds[[<span class="dv">4</span>]] <span class="sc">+</span> refmap.dimreds[[<span class="dv">5</span>]] <span class="sc">+</span> patchwork<span class="sc">::</span><span class="fu">plot_layout</span>(<span class="at">ncol =</span> <span class="dv">5</span>)</span></code></pre></div>
+<p><img src="hands-on-introduction_files/figure-revealjs/project%20reference%20onto%20query-1.png" width="1920" /></p>
+</section>
+<section class="slide level2">
+
+<h3 id="custom-reference-mapping">Custom reference-mapping</h3>
+<p><small>Custom reference-mapping can be performed by calling the <code>Seurat</code> functions <code>FindTransferAnchors()</code> and <code>MapQuery()</code>.</small></p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="do">## customized reference</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="co"># split Seurat object into reference and query</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>seu.list <span class="ot">&lt;-</span> <span class="fu">SplitObject</span>(<span class="at">object =</span> seu, <span class="at">split.by =</span> <span class="st">&quot;batch&quot;</span>)</span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalize reference and query</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>seu.list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(seu.list, NormalizeData)</span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Process the reference</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>seu.list<span class="sc">$</span>V2 <span class="ot">&lt;-</span> <span class="fu">FindVariableFeatures</span>(seu.list<span class="sc">$</span>V2)</span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>seu.list<span class="sc">$</span>V2 <span class="ot">&lt;-</span> <span class="fu">ScaleData</span>(seu.list<span class="sc">$</span>V2)</span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>seu.list<span class="sc">$</span>V2 <span class="ot">&lt;-</span> <span class="fu">RunPCA</span>(seu.list<span class="sc">$</span>V2)</span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>seu.list<span class="sc">$</span>V2 <span class="ot">&lt;-</span> <span class="fu">RunUMAP</span>(seu.list<span class="sc">$</span>V2, <span class="at">dims =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">reduction =</span> <span class="st">&quot;pca&quot;</span>, <span class="at">return.model =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Transfer anchors between reference and query</span></span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a>anchors <span class="ot">&lt;-</span> <span class="fu">FindTransferAnchors</span>(<span class="at">reference =</span> seu.list<span class="sc">$</span>V2, <span class="at">query =</span> seu.list<span class="sc">$</span>V1, </span>
+<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">dims =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, <span class="at">reference.reduction =</span> <span class="st">&quot;pca&quot;</span>)</span>
+<span id="cb65-14"><a href="#cb65-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Map query</span></span>
+<span id="cb65-15"><a href="#cb65-15" aria-hidden="true" tabindex="-1"></a>seu.list<span class="sc">$</span>V1 <span class="ot">&lt;-</span> <span class="fu">MapQuery</span>(<span class="at">anchorset =</span> anchors, <span class="at">reference =</span> seu.list<span class="sc">$</span>V2, <span class="at">query =</span> seu.list<span class="sc">$</span>V1,</span>
+<span id="cb65-16"><a href="#cb65-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">refdata =</span> <span class="fu">list</span>(<span class="at">celltype =</span> <span class="st">&quot;cell_type&quot;</span>), <span class="at">reference.reduction =</span> <span class="st">&quot;pca&quot;</span>, </span>
+<span id="cb65-17"><a href="#cb65-17" aria-hidden="true" tabindex="-1"></a>                        <span class="at">reduction.model =</span> <span class="st">&quot;umap&quot;</span>)</span></code></pre></div>
+</section>
+<section class="slide level2">
+
+<h3 id="project-query-onto-custom-reference">Project query onto custom reference</h3>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="do">## project reference onto query</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>custom.refmap.dimreds <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>custom.refmap.dimreds[[<span class="st">&quot;ref_umap_cell_type&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu.list<span class="sc">$</span>V2, <span class="at">reduction =</span> <span class="st">&quot;umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;cell_type&quot;</span>,  </span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>                                                         <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>custom.refmap.dimreds[[<span class="st">&quot;query_umap_cell_type&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu.list<span class="sc">$</span>V1, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;cell_type&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>custom.refmap.dimreds[[<span class="st">&quot;query_umap_preds&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">DimPlot</span>(seu.list<span class="sc">$</span>V1, <span class="at">reduction =</span> <span class="st">&quot;ref.umap&quot;</span>, <span class="at">group.by =</span> <span class="st">&quot;predicted.celltype&quot;</span>, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">pt.size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> <span class="fu">NoLegend</span>()</span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>custom.refmap.dimreds[[<span class="dv">1</span>]] <span class="sc">+</span> custom.refmap.dimreds[[<span class="dv">2</span>]] <span class="sc">+</span> custom.refmap.dimreds[[<span class="dv">3</span>]]</span></code></pre></div>
+<p><img src="hands-on-introduction_files/figure-revealjs/project%20custom%20reference%20onto%20query-1.png" width="1344" /></p>
+</section>
+<section class="slide level2">
+
+<h3 id="custom-reference-mapping-assessment">Custom reference-mapping assessment</h3>
+<p><small>Confusion matrix between predicted cell type labels versus ground-truth.</small></p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># confusion matrix</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(seu.list<span class="sc">$</span>V1<span class="sc">$</span>predicted.celltype, seu.list<span class="sc">$</span>V1<span class="sc">$</span>cell_type)</span></code></pre></div>
+<pre><code>##           
+##            adc bmem bnaive cd4mem cd4naive cd8eff cd8mem cd8naive hsc  mk
+##   adc       72    0      0      0        0      0      0        0   0   0
+##   bmem       0  183     25      0        0      0      0        0  12   0
+##   bnaive     0   11    361      0        0      0      0        0   0   0
+##   cd4mem     0    0      0    567      127      6     12       13   0   0
+##   cd4naive   0    0      0     26      851      0      3       35   0   0
+##   cd8eff     0    1      0      4        1    523     15       11   0   0
+##   cd8mem     0    0      0      0        0      1      0        0   0   0
+##   cd8naive   0    0      0      1        4     20     24      240   0   0
+##   hsc        0    0      0      0        0      0      0        0   8   0
+##   mk         0    0      0      0        0      0      0        0   0  19
+##   mono14     3    1      0      0        0      0      0        0   0   3
+##   mono16     1    0      0      0        0      0      0        0   0   0
+##   nk         0    0      0      0        0      2      1        0   0   0
+##   pdc        0    0      0      0        0      0      0        0   0   0
+##   treg       0    1      0      2        0      1      0        0   1   0
+##           
+##            mono14 mono16  nk pdc treg
+##   adc           4      0   0   0    0
+##   bmem          0      0   0   0    0
+##   bnaive        0      0   0   0    0
+##   cd4mem        0      0   0   0   26
+##   cd4naive      0      0   0   0    6
+##   cd8eff        0      0  13   0    1
+##   cd8mem        0      0   0   0    0
+##   cd8naive      0      0   0   0    0
+##   hsc           0      0   0   0    0
+##   mk            0      0   0   0    0
+##   mono14      803      6   1   0    0
+##   mono16       50    326   0   0    0
+##   nk            0      0 281   0    0
+##   pdc           0      0   0  11    0
+##   treg          0      0   1   0   49</code></pre>
+</section>
+<section class="slide level2">
+
+</section></section>
+    </div>
+  </div>
+
+  <script src="hands-on-introduction_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="hands-on-introduction_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: true,
+        // Transition style
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'default', // none/fade/slide/convex/concave/zoom
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'hands-on-introduction_files/reveal.js-3.3.0.1/plugin/notes/notes.js', async: true },
+          { src: 'hands-on-introduction_files/reveal.js-3.3.0.1/plugin/zoom-js/zoom.js', async: true },
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,465 @@
+---
+title: "Introduction to the integration hands-on"
+subtitle: "The Hitchhiker’s Guide to scRNA-seq, iMM"
+author: "António Sousa"
+date: "09/07/2024"
+output: 
+  revealjs::revealjs_presentation:
+    theme: blood
+    highlight: zenburn
+    center: True
+    self_contained: False
+    reveal_options:
+      slideNumber: True
+    css: config/css/config.css
+    reveal_plugins: ["notes", "zoom"]
+---
+
+# Seurat
+
+---
+
+### R `list`s
+
+A `list` in R is an object that can comprise different data types of different lengths. The elements in the list are ordered and changeable.
+
+```{r R lists - part 1}
+# set seed
+set.seed(123)
+
+# student class sizes 
+student_class_sizes <- sample(15:30, 3)
+
+# list with 3 classes with student class names  
+student_class_names <- list("class1" = randomNames::randomNames(n = student_class_sizes[1]), 
+                            "class2" = randomNames::randomNames(n = student_class_sizes[2]),
+                            "class3" = randomNames::randomNames(n = student_class_sizes[3]))
+```
+
+---
+
+`List`s can be queried or indexed by name or index position number in the `list`.
+
+```{r R lists - part 2}
+head(student_class_names$class1) # first element in the list retrieved by name
+head(student_class_names[[2]]) # second element in the list retrieved by the index number
+```
+
+---
+
+### `lapply` function 
+
+`lapply` is a function that applies a function to every element in a list returning the result into a list. 
+
+```{r lapply - part 1}
+# check the size/length of every class in the list
+class_size <- lapply(student_class_names, length)
+class_size
+```
+
+---
+
+The `FUN` parameter can take any existing function or a customized function. 
+
+```{r lapply - part 2}
+# get the length, i.e., no. of characters, of the longest name in every class
+longest_name <- lapply(X = student_class_names, FUN = function(x) {
+  max( nchar(x) ) # nested functions
+})
+longest_name
+```
+
+---
+
+### `dplyr` syntax 
+
+```{r dplyr syntax - part 1}
+# dplyr syntax
+library("dplyr") # data wrangling
+
+# Use the 'iris' dataset
+head(iris)
+```
+
+---
+
+```{r dplyr syntax - part 2}
+## dplyr syntax
+# get the mean for all numeric columns
+iris %>% 
+  summarise_if(is.numeric, mean)
+
+# get the mean of 'Sepal.Length' when 'Petal.Length' is higher than 3.7
+iris %>% 
+  filter(Petal.Length > 3.7) %>% 
+  summarise(Sepal.Length.Mean = mean(Sepal.Length))
+```
+
+---
+
+## Input
+
+---
+
+<small>10X scRNA-seq data processed with `CellRanger` software can be imported into R/Seurat by specifying the folder holding the following three files (they can be compressed as well): `barcodes.tsv`, `matrix.tsv`, `genes.tsv`.</small>
+
+```{r 10X directory}
+# 10X data directory (downloaded from 10X website - see links below):
+#https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc6k
+#https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/pbmc8k
+data10X.dir <- "../hands-on/data/10x_3pV1_2"
+samples.10X <- c("pbmc6k_3pV1", "pbmc8k_3pV2")
+samples.10X.dir <- file.path(data10X.dir, samples.10X)
+names(samples.10X.dir) <- c("V1", "V2")
+samples.10X.dir
+list.files(samples.10X.dir)
+```
+
+---
+
+<small>Import 10X samples from the same project into `Seurat`.</small>
+
+```{r package, message=FALSE, warning=FALSE}
+# Import package
+library("Seurat")
+```
+
+```{r import 10X data, eval=FALSE}
+# import 10X data as sparse matrix & create Seurat object
+counts <- Read10X(data.dir = samples.10X.dir)
+seu <- CreateSeuratObject(counts = counts)
+```
+
+---
+
+<small>Import 10X samples from the different projects, i.e., processed independently with `CellRanger`, into `Seurat`.</small>
+
+```{r impor 10X data - list}
+# import 10X samples as individual 10X samples
+seu.list <- lapply(X = samples.10X.dir, FUN = function(x) {
+  CreateSeuratObject(counts = Read10X(data.dir = x))
+})
+# merge samples & counts layer
+seu <- merge(x = seu.list[[1]], y = seu.list[[2]], add.cell.ids = names(seu.list))
+seu[["RNA"]] <- JoinLayers(object = seu[["RNA"]])
+seu
+```
+
+---
+
+<small>Export a `Seurat` object in `RDS` format.</small>
+
+```{r export Seurat}
+# export Seurat R object as .RDS file
+saveRDS(object = seu, file = file.path(data10X.dir, "seurat.rds"))
+```
+
+<small>Import a `Seurat` object saved as `RDS` format.</small>
+
+```{r import rds Seurat}
+# import RDS Seurat R object 
+seu <- readRDS(file = file.path(data10X.dir, "seurat.rds"))
+```
+
+---
+
+## SeuratObject
+
+---
+
+### `SeuratObject`
+
+<small>`SeuratObject` is a S4 class object. The different layers of information can be accessed with `Seurat` functions or using the accessor `@` (see examples below).</small>
+
+---
+
+### @assays
+
+```{r seurat object - assays}
+# Seurat assays slot
+seu@assays
+```
+
+---
+
+### @meta.data
+
+```{r seurat object - meta.data part 1}
+# Seurat meta.data slot
+head(seu@meta.data)
+```
+
+---
+
+<small>Cell metadata can be added to the `seu@meta.data` slot.</small>
+
+```{r seurat object - meta.data part 2}
+# Add more meta data: 
+#import "Source Data Fig.3" excel file with cell annotations from Harmony paper: https://doi.org/10.1038/s41592-019-0619-0
+meta.data <- readxl::read_excel(path = file.path(data10X.dir, "41592_2019_619_MOESM9_ESM.xlsx"))
+meta.data <- dplyr::filter(meta.data, dataset %in% c("three_prime_v1", "three_prime_v2"))
+meta.data <- as.data.frame(meta.data)
+row.names(meta.data) <- paste(paste0(toupper(gsub("three_prime_", "", meta.data$dataset)), "_"), 
+                              meta.data$cell_id, "-1", sep = "")
+meta.data <- meta.data[! is.na(meta.data$cell_subtype), ] # remove cells not annotated
+seu <- subset(seu, cells = row.names(meta.data)) # removed 754 cells (total: 13,046)
+seu$cell_type <- meta.data[colnames(seu), "cell_subtype"] # adding cell annotations to Seurat meta data
+seu$batch <- ifelse(grepl(pattern = "^V1_", x = colnames(seu)), "V1", "V2")
+```
+
+---
+
+```{r seurat object - meta.data part 3}
+head(seu@meta.data)
+```
+
+---
+
+### @graphs/neighbors/reductions
+
+```{r seurat object - others, eval=FALSE}
+# other data slots in Seurat object
+seu@graphs
+seu@neighbors
+seu@reductions
+```
+
+---
+
+# Standard workflow
+
+---
+
+### Standard workflow
+
+```{r standard workflow, message=FALSE, warning=FALSE}
+# Standard Seurat upstream workflow
+seu <- NormalizeData(seu)
+seu <- FindVariableFeatures(seu)
+seu <- ScaleData(seu)
+seu <- RunPCA(seu)
+```
+
+---
+
+### Dimensional reduction
+
+```{r unintegrated dimreds, message=FALSE, warning=FALSE}
+## Plot jointly dimreds
+
+# Run UMAP
+seu <- RunUMAP(seu, dims = 1:30, reduction = "pca", reduction.name = "umap.unintegrated")
+
+# Plot
+unint.dimreds <- list() 
+unint.dimreds[["pca_batch"]] <- DimPlot(seu, reduction = "pca", group.by = "batch", pt.size = 0.1, alpha = 0.5)
+unint.dimreds[["pca_cell_type"]] <- DimPlot(seu, reduction = "pca", group.by = "cell_type", pt.size = 0.1, alpha = 0.5)
+unint.dimreds[["umap_batch"]] <- DimPlot(seu, reduction = "umap.unintegrated", group.by = "batch", pt.size = 0.1, alpha = 0.5)
+unint.dimreds[["umap_cell_type"]] <- DimPlot(seu, reduction = "umap.unintegrated", group.by = "cell_type", pt.size = 0.1, alpha = 0.5)
+```
+
+---
+
+### Batch assessment (PCA)
+
+```{r unintegrated dimreds - pcas, fig.width=9, fig.height=4}
+# Print UMAPs
+unint.dimreds[[1]] + unint.dimreds[[2]]   
+```
+
+---
+
+### Batch assessment (UMAP)
+
+```{r dimreds - umaps, fig.width=9, fig.height=4}
+# Print UMAPs
+unint.dimreds[[3]] + unint.dimreds[[4]]   
+```
+
+---
+
+### Clustering
+
+```{r clustering, message=FALSE, warning=FALSE}
+# graph-based clustering
+seu <- FindNeighbors(seu, dims = 1:30, reduction = "pca") # shared nearest-neighbor graph
+seu <- FindClusters(seu, resolution = 2, cluster.name = "unintegrated_clusters") # cell population detection - Louvain algorithm
+unint.dimreds[["umap_clusters"]] <- DimPlot(seu, reduction = "umap.unintegrated", 
+                                            group.by = "unintegrated_clusters", pt.size = 0.1, alpha = 0.5)
+```
+
+---
+
+```{r clustering - print, fig.height=4, fig.width=14}
+unint.dimreds[[3]] + unint.dimreds[[4]] + unint.dimreds[[5]]
+```
+
+---
+
+# Integration
+
+---
+
+### Split `layers`
+
+<small>Split `layers` before integration by providing the cell `batch` label identity.</small>
+
+```{r split layers - part 1}
+# how does it look the object before splitting
+seu
+
+# split the 'layers' by 'batch'
+seu[["RNA"]] <- split(x = seu[["RNA"]], f = seu$batch)
+```
+
+```{r split layers - part 2}
+# Seurat object after split
+seu
+```
+
+---
+
+### Integration workflow
+
+<small>Different integration methods can be called from `Seurat` `IntegrateLayers()` function: `CCAIntegration` and `RPCAIntegration` (from `Seurat`), `HarmonyIntegration`, `FastMNNIntegration` and `scVIIntegration` (wrapper functions from `SeuratWrappers` - the packages from the respective methods need to be installed first).</small>
+
+```{r integration workflow, message=FALSE, warning=FALSE}
+# integration Seurat workflow
+seu <- NormalizeData(seu)
+seu <- FindVariableFeatures(seu)
+seu <- ScaleData(seu)
+seu <- RunPCA(seu)
+seu <- IntegrateLayers(object = seu, 
+                       method = CCAIntegration, # RPCAIntegration / HarmonyIntegration / FastMNNIntegration / scVIIntegration
+                       orig.reduction = "pca", 
+                       new.reduction = "integrated.cca")
+seu[["RNA"]] <- JoinLayers(seu[["RNA"]])
+```
+
+---
+
+### Clustering 
+
+```{r integrated clustering, message=FALSE, warning=FALSE}
+# cluster integrated dimensional reduction
+seu <- FindNeighbors(seu, reduction = "integrated.cca", dims = 1:30)
+seu <- FindClusters(seu, resolution = 2, cluster.name = "integrated_clusters")
+seu
+```
+
+---
+
+### Dimensional reduction
+
+```{r integrated dimreds, message=FALSE, warning=FALSE, fig.width=14, fig.height=4}
+## Plot jointly dimreds
+# Run UMAP
+seu <- RunUMAP(seu, dims = 1:30, reduction = "integrated.cca", reduction.name = "umap.integrated")
+
+# Plot
+int.dimreds <- list() 
+int.dimreds[["umap_batch"]] <- DimPlot(seu, reduction = "umap.integrated", group.by = "batch", pt.size = 0.1, alpha = 0.5)
+int.dimreds[["umap_cell_type"]] <- DimPlot(seu, reduction = "umap.integrated", group.by = "cell_type", pt.size = 0.1, alpha = 0.5)
+int.dimreds[["umap_clusters"]] <- DimPlot(seu, reduction = "umap.integrated", group.by = "integrated_clusters", pt.size = 0.1, alpha = 0.5)
+int.dimreds[[1]] + int.dimreds[[2]] + int.dimreds[[3]]
+```
+
+---
+
+# Reference-mapping
+
+---
+
+### Azimuth references
+
+<small>`SeuratData` provides some ready to use `Azimuth` references.</small>
+
+```{r available azimuth references, message=FALSE, warning=FALSE}
+## Reference-mapping with Azimuth
+# Import library
+library("Azimuth")
+library("SeuratData") # contains some Azimuth references
+
+# Azimuth references available in SeuratData
+SeuratData::AvailableData() %>% filter(grepl("ref.", row.names(.), ))
+```
+
+---
+
+### Azimuth reference-mapping
+
+<small>`Azimuth` can be run by providing the `Seurat` object to be annotated and one of the `SeuratData` `Azimuth` references.</small>
+
+```{r azimuth reference-mapping, message=FALSE, warning=FALSE}
+## Azimuth reference-mapping
+refmap <- RunAzimuth(seu, reference = "pbmcref") # installs 'pbmcref' if does not exists
+refmap
+```
+
+---
+
+### Project query onto reference 
+
+```{r project reference onto query, message=FALSE, warning=FALSE, fig.width=20, fig.height=4}
+## project reference onto query
+refmap.dimreds <- list()
+refmap.dimreds[["umap_batch"]] <- DimPlot(refmap, reduction = "ref.umap", group.by = "batch", label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+refmap.dimreds[["umap_cell_type"]] <- DimPlot(refmap, reduction = "ref.umap", group.by = "cell_type",  label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+refmap.dimreds[["umap_preds_l1"]] <- DimPlot(refmap, reduction = "ref.umap", group.by = "predicted.celltype.l1", label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+refmap.dimreds[["umap_preds_l2"]] <- DimPlot(refmap, reduction = "ref.umap", group.by = "predicted.celltype.l2", label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+refmap.dimreds[["umap_preds_l3"]] <- DimPlot(refmap, reduction = "ref.umap", group.by = "predicted.celltype.l3", label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+refmap.dimreds[[1]] + refmap.dimreds[[2]] + refmap.dimreds[[3]] + refmap.dimreds[[4]] + refmap.dimreds[[5]] + patchwork::plot_layout(ncol = 5)
+```
+
+---
+
+### Custom reference-mapping
+
+<small>Custom reference-mapping can be performed by calling the `Seurat` functions `FindTransferAnchors()` and `MapQuery()`.</small>
+
+```{r refmap customized reference, message=FALSE, warning=FALSE}
+## customized reference
+# split Seurat object into reference and query
+seu.list <- SplitObject(object = seu, split.by = "batch")
+# Normalize reference and query
+seu.list <- lapply(seu.list, NormalizeData)
+# Process the reference
+seu.list$V2 <- FindVariableFeatures(seu.list$V2)
+seu.list$V2 <- ScaleData(seu.list$V2)
+seu.list$V2 <- RunPCA(seu.list$V2)
+seu.list$V2 <- RunUMAP(seu.list$V2, dims = 1:30, reduction = "pca", return.model = TRUE)
+# Transfer anchors between reference and query
+anchors <- FindTransferAnchors(reference = seu.list$V2, query = seu.list$V1, 
+                               dims = 1:30, reference.reduction = "pca")
+# Map query
+seu.list$V1 <- MapQuery(anchorset = anchors, reference = seu.list$V2, query = seu.list$V1,
+                        refdata = list(celltype = "cell_type"), reference.reduction = "pca", 
+                        reduction.model = "umap")
+```
+
+---
+
+### Project query onto custom reference 
+
+```{r project custom reference onto query, message=FALSE, warning=FALSE, fig.width=14, fig.height=4}
+## project reference onto query
+custom.refmap.dimreds <- list()
+custom.refmap.dimreds[["ref_umap_cell_type"]] <- DimPlot(seu.list$V2, reduction = "umap", group.by = "cell_type",  
+                                                         label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+custom.refmap.dimreds[["query_umap_cell_type"]] <- DimPlot(seu.list$V1, reduction = "ref.umap", group.by = "cell_type", label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+custom.refmap.dimreds[["query_umap_preds"]] <- DimPlot(seu.list$V1, reduction = "ref.umap", group.by = "predicted.celltype", label = TRUE, pt.size = 0.1, alpha = 0.5) + NoLegend()
+custom.refmap.dimreds[[1]] + custom.refmap.dimreds[[2]] + custom.refmap.dimreds[[3]]
+```
+
+---
+
+### Custom reference-mapping assessment
+
+<small>Confusion matrix between predicted cell type labels versus ground-truth.</small>
+
+```{r confusion matrix}
+# confusion matrix
+table(seu.list$V1$predicted.celltype, seu.list$V1$cell_type)
+```
+
+---
