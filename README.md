@@ -2,6 +2,9 @@
 
 Official Code repository for the "The Hitchhiker's Guide to scRNA-seq" Workshop at iMM
 
+Use this Google Drive for any questions and interactions during the WOrkshop
+`https://drive.google.com/drive/folders/1Eb_yre1mUSxM_xhzcVRs_urtw0gXEc8g?usp=share_link`
+
 Each day will be carried by one trainer and you will be able to find the material associated with each Day in the corresponding directory.
 Some files exceeding 25 MB will be availble thru other means. 
 
