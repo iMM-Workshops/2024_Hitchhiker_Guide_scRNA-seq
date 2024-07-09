@@ -28,7 +28,7 @@ pip install .
 # make sure the trailing dot is included in the line above
 ```
 
-3. Install further useful packages. Mamba  
+3. Install further useful packages.  
 
 ```bash
 conda install seaborn scirpy
@@ -46,3 +46,10 @@ Now, let's launch `jupyter lab`:
 ``` bash
 jupyter lab
 ```
+Navigate to the folder where you have saved `IMM_AIR.ipynb`, select the `imm_air_env` kernel as your environment and you're ready to go. 
+
+## Google Colab
+If you are having trouble with installing this on your machine, you can use a Google Colab notebook instead. You will need a Google account for this. 
+1. Add the file `IMM_AIR.ipynb` to your Google Drive and double-click on it, which should open it directly in Google Colab.
+2. Add the files from Google Drive folder (https://drive.google.com/drive/folders/1Uk6pmMRzpwnjfZobabHChDNMoGAd-aHE?usp=drive_link) to your own Google Drive to access them via Google Colab.
+3. Execute the first lines of the Google Colab notebook related to mounting your Google Drive and installing the packages.
