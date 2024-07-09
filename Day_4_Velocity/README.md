@@ -12,6 +12,7 @@ It will include the theoretical session, which will be in the morning, and the p
 
 ## Table of Content
 * [Set up the conda environment](#set-up-the-conda-environment)
+* [Example dataset](#example-dataset)
 * [Markdown vignette](#markdown-vignette)
 * [Slides](#slides)
 * [More vignettes](#more-vignettes)
@@ -42,6 +43,9 @@ echo 'devtools::install_github("mojaveazure/seurat-disk")' | R --vanilla
 ```
 
 In the repository there is also the `environment_hitchhiker2024.yml` file which can be used to create the conda environment. However, it doesn't cover the R packages which are not installed directly with `conda`, and it might fail if you are not using Linux.
+
+## Example dataset
+The example dataset used in the practical session is one 10x scRNA-seq experiment included in the following publication: [Organoid single-cell genomic atlas uncovers human-specific features of brain development](https://www.nature.com/articles/s41586-019-1654-9). The Seurat object can be downloaded via this [link](https://polybox.ethz.ch/index.php/s/bjNnfD9I3rwpjIt). It includes the processed RNA assay, plus the "spliced" and "unspliced" assays with the spliced and unspliced transcript count matrices, which are needed for the RNA velocity analysis.
 
 ## Markdown vignette
 In this repository there is a Markdown tutorial which includes the codes for the practical session: [pseudotime_trajectory_velocity.md](https://github.com/iMM-Workshops/2024_Hitchhiker_Guide_scRNA-seq/blob/main/Day_4_Velocity/pseudotime_trajectory_velocity.md).
