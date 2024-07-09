@@ -730,6 +730,8 @@ connected_celltypes
 
 Next, we run scVelo for the RNA velocity analysis. It expects the input AnnData object contains two layers, one called 'spliced' for the spliced transcript count matrix, and the other called 'unspliced' for the unspliced transcript count matrix. Here we don't need to worry about it because when converting the data to AnnData, we have already addressed this issue.
 
+However, if you don't yet have these two matrices, you have to generate them first and include them in the AnnData object. There are different tools to obtain those two matrices. One example is the command line interface of `velocyto`, as mentioned in their [documentation](https://velocyto.org/velocyto.py/tutorial/cli.html). The output of `velocyto` is a `loom` file, which can be read into R with `loomR` or into Python with `loompy`. Another example is [dropEst](https://github.com/kharchenkolab/dropEst), which can generate an RDS file. By loading the file into R, you can get a list with the matrices.
+
 The first steps of scVelo is 1) basic preprocessing (gene selection and normalization), and 2) computing the first- and second-order moments (means and uncentered variances) for velocity estimation
 
 
