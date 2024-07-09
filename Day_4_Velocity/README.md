@@ -51,7 +51,7 @@ The example dataset used in the practical session is one 10x scRNA-seq experimen
 In this repository there is a Markdown tutorial which includes the codes for the practical session: [pseudotime_trajectory_velocity.md](https://github.com/iMM-Workshops/2024_Hitchhiker_Guide_scRNA-seq/blob/main/Day_4_Velocity/pseudotime_trajectory_velocity.md).
 
 ## Slides
-The slides of the practical session have been uploaded ([pseudotime_velocity_practical.pdf](https://github.com/iMM-Workshops/2024_Hitchhiker_Guide_scRNA-seq/blob/main/Day_4_Velocity/pseudotime_velocity_practical.pdf)). It includes both the environment setup guideline and the codes. Please note that modifications may be made in the final slides.
+The slides of the practical session have been uploaded ([pseudotime_velocity_practical.pdf](https://github.com/iMM-Workshops/2024_Hitchhiker_Guide_scRNA-seq/blob/main/Day_4_Velocity/slides/pseudotime_velocity_practical.pdf)). The slides of the theoretical session is also accessible ([pseudotime_velocity_theory.pdf](https://github.com/iMM-Workshops/2024_Hitchhiker_Guide_scRNA-seq/blob/main/Day_4_Velocity/slides/pseudotime_velocity_theory.pdf)) It includes both the environment setup guideline and the codes. Please note that modifications may be made in the final slides.
 
 ## More vignettes:
 There are more vignettes available in Github for scRNA-seq data analysis:
