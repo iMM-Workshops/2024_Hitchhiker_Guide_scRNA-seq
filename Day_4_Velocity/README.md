@@ -72,6 +72,12 @@ You can also download a file to the virtual machine so that you can load it into
 ```
 !wget -O 'DS1.h5ad' 'https://polybox.ethz.ch/index.php/s/bUYZE6qPgROBggH/download'
 ```
+You can also mount your Google Drive at the Colab notebook, in order to access your files there or to place the downloaded/saved file there:
+```
+from google.colab import drive
+drive.mount('/content/drive')
+```
+*P.S.* Please make sure all the requested permission are granted. Otherwise the mounting will be failed.
 
 ## Example dataset
 The example dataset used in the practical session is one 10x scRNA-seq experiment included in the following publication: [Organoid single-cell genomic atlas uncovers human-specific features of brain development](https://www.nature.com/articles/s41586-019-1654-9). The Seurat object can be downloaded via this [link](https://polybox.ethz.ch/index.php/s/bjNnfD9I3rwpjIt). It includes the processed RNA assay, plus the "spliced" and "unspliced" assays with the spliced and unspliced transcript count matrices, which are needed for the RNA velocity analysis.
