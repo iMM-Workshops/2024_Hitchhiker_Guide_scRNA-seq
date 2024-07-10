@@ -8,10 +8,14 @@ This session will cover the following topics:
 * Fate probability estimation
 * RNA velocity analysis
 
-It will include the theoretical session, which will be in the morning, and the practical session, which will be largely in the afternoon. For the practical session, it will needs both R and Python. For that, it is recommended to use `miniconda` or `anaconda` to set up a conda environment. For Windows user, it is recommended to install a WSL (Windows Subsystem for Linux), as it has much better conda support than Windows. For MacOS user, please make sure you have set up the compilation toolkit as mentioned in this [link](https://mac.r-project.org/tools/).</br>
+It will include the theoretical session, which will be in the morning, and the practical session, which will be largely in the afternoon. For the practical session, it will needs both R and Python. For that, it is recommended to use `miniconda` or `anaconda` to set up a conda environment. For Windows user, it is recommended to install a WSL (Windows Subsystem for Linux), as it has much better conda support than Windows. For MacOS user, please make sure you have set up the compilation toolkit as mentioned in this [link](https://mac.r-project.org/tools/).
+
+There are alternative ways, for example, to use a standardly installed R for the R part and Google Colab for the Python part. If you are a Windows user and would like to do in this way, please make sure you have your R installed, so as [RTools](https://cran.r-project.org/bin/windows/Rtools/) which includes the toolkit in Windows if the installation of an R package requires any compilation.
 
 ## Table of Content
 * [Set up the conda environment](#set-up-the-conda-environment)
+* [Standard R configuration](#standard-r-configuration)
+* [Google Colab](#google-colab)
 * [Example dataset](#example-dataset)
 * [Markdown vignette](#markdown-vignette)
 * [Slides](#slides)
