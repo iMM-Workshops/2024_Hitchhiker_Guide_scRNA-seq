@@ -1,6 +1,6 @@
 # Velocity
 
-This session is handled by Zhisong He
+This session is handled by [Zhisong He](https://zhisonghe.wixsite.com/home/)
 
 This session will cover the following topics:
 * Trajectory analysis
