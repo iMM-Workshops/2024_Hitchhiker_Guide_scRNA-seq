@@ -1,6 +1,8 @@
 # Adaptive Immune Receptor (AIR)
 
-This session is handled by Lisa Dratva
+This session is handled by Lisa Dratva.
+
+If you have any questions or comments regarding the session or future VDJ analysis, please don't hesitate to reach me at [LMD76@cam.ac.uk](mailto:lmd76@cam.ac.uk) and connect on [LinkedIn](https://www.linkedin.com/in/lisadratva/)!
 
 ## Installation
 
@@ -31,7 +33,8 @@ pip install .
 3. Install further useful packages.  
 
 ```bash
-conda install seaborn scirpy
+conda install seaborn 
+pip install scirpy
 conda install -c bioconda bbknn
 ```
 
@@ -42,11 +45,11 @@ conda install -c conda-forge jupyterlab
 python -m ipykernel install --user --name imm_air_env
 ```
 
-Now, let's launch `jupyter lab`:
+Now, let's launch `jupyter lab`. First, `cd` into the directory where you have saved the `IMM_AIR.ipynb` and the datasets to, then run:
 ``` bash
 jupyter lab
 ```
-Navigate to the folder where you have saved `IMM_AIR.ipynb`, select the `imm_air_env` kernel as your environment and you're ready to go. 
+Select the `imm_air_env` kernel as your environment and you're ready to go. 
 
 ## Google Colab
 If you are having trouble with installing this on your machine, you can use a Google Colab notebook instead. You will need a Google account for this. 
