@@ -503,6 +503,8 @@ sc.pp.neighbors(adata, n_neighbors=50, n_pcs=20, use_rep='X_pca')
 sc.tl.diffmap(adata, n_comps=20)
 ```
 
+*P.S.* If you fail to generate the DS1.h5ad earlier due to technical reason, you can download the file via this [link](https://polybox.ethz.ch/index.php/s/bUYZE6qPgROBggH).
+
 In scanpy, the diffusion pseudotime (`scanpy.tl.dpt`) function requires the root cell to be manually labeled. To use the same root guessing procedure as implemented in destiny in R, we have to re-implement it with the following code:
 
 
