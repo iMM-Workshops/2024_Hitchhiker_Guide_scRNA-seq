@@ -35,7 +35,7 @@ You will learn how to perform pseudotime and trajectory analysis.
 ## Day 5 - Spatial Transcriptomics 
 **_Trainer:_** Anna Maguza, Würzburg Institute of Systems Immunology \
 Introduction to spatial transcriptomic
-Link to the practical part 1 (squidpy) - [https://colab.research.google.com/drive/1h5_7uNIVSuJ9UfhkVlauP3Kmwj3b04EY?authuser=2#scrollTo=ThAkw4NrHx0j](https://colab.research.google.com/drive/1h5_7uNIVSuJ9UfhkVlauP3Kmwj3b04EY?usp=sharing)
+Link to the practical part 1 (squidpy) - [https://colab.research.google.com/drive/1h5_7uNIVSuJ9UfhkVlauP3Kmwj3b04EY?authuser=2#scrollTo=ThAkw4NrHx0j](https://colab.research.google.com/drive/1h5_7uNIVSuJ9UfhkVlauP3Kmwj3b04EY?usp=sharing)  
 Link to the practical part 2 (cell2location) - [https://colab.research.google.com/drive/1U-CkXyWiiOA-3xg1w1VrrDE7SY7zTbyP?usp=sharing](https://colab.research.google.com/drive/1U-CkXyWiiOA-3xg1w1VrrDE7SY7zTbyP?usp=sharing)
 
 
